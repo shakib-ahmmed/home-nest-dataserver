@@ -11,7 +11,8 @@ app.use(cors());
 app.use(express.json());
 
 
-const uri = "mongodb+srv://homenestDBUSer:w9HegOWJ1Yrue5lZ@cluster0.wy1sbbd.mongodb.net/?appName=Cluster0";
+const uri = "mongodb+srv://<db_username>:<db_password>@cluster0.ovreryk.mongodb.net/?appName=Cluster0";
+
 const client = new MongoClient(uri, {
     serverApi: {
         version: ServerApiVersion.v1,
@@ -19,7 +20,7 @@ const client = new MongoClient(uri, {
         deprecationErrors: true,
     }
 });
- 
+
 
 app.get('/', (req, res) => {
     res.send('smart server is running')
@@ -28,7 +29,24 @@ app.get('/', (req, res) => {
 async function run() {
     try {
         await client.connect();
+        const db = client.db('homenestDBUSers')
+        const propertiesCollection = db.collection('properties')
 
+        app.get('/properties', async (req, res) => {
+
+            const result = await propertiesCollection.find().toArray()
+
+            console.log(result)
+
+
+
+
+
+
+
+
+            res.send('result')
+        })
 
 
 
