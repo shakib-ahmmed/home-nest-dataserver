@@ -41,7 +41,7 @@ async function run() {
 
             const result = await propertiesCollection.find().toArray()
 
-
+            console.log(hello)
             res.send(result)
         })
 
