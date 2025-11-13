@@ -29,7 +29,37 @@ async function run() {
         const propertiesCollection = db.collection('properties');
         const reviewsCollection = db.collection('reviews');
 
+        app.get('/properties', async (req, res) => {
+            try {
+                const { userEmail, sortBy, order, search } = req.query;
+                const query = {};
 
+               
+                if (userEmail) {
+                    query["PostedBy.Email"] = userEmail;
+                }
+
+                if (search) {
+                    query.PropertyName = { $regex: search, $options: "i" };
+                }
+
+                const sortOptions = {};
+                if (sortBy) {
+                    const field = sortBy === "price" ? "Price" : "PostedDate";
+                    sortOptions[field] = order === "desc" ? -1 : 1;
+                }
+
+                const properties = await propertiesCollection
+                    .find(query)
+                    .sort(sortOptions)
+                    .toArray();
+
+                res.json(properties);
+            } catch (error) {
+                console.error("❌ Error fetching properties:", error);
+                res.status(500).json({ message: "Failed to fetch properties" });
+            }
+        });
 
 
 
@@ -137,8 +167,8 @@ async function run() {
             }
 
             try {
-                const { _id, ...updateData } = req.body; 
-                updateData.Price = Number(updateData.Price); 
+                const { _id, ...updateData } = req.body;
+                updateData.Price = Number(updateData.Price);
 
                 console.log("Updating property:", id, updateData);
 
@@ -157,10 +187,7 @@ async function run() {
                 res.status(500).json({ error: err.message });
             }
         });
-
-
-
-
+       
         console.log("MongoDB connected and backend routes are ready!");
     } catch (err) {
         console.error(err);
